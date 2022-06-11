@@ -461,13 +461,6 @@ public class Main {
 	//	int check = 0;
 		System.out.println();
 		System.out.print(subtask + " ");
-		//finding inter island communication for this subtask
-		for(int i = 0; i < no_of_subtasks; i++) {
-			if(predecessor_mat[subtask][i] == 1 && subtask_to_processor[i] % 2 != subtask_to_processor[subtask] % 2) {
-				island_communication++;
-			}
-		}
-		System.out.println("comm. cost " + subtask + " " + island_communication);
 		while(execution_cost > 0) {
 			
 		//	System.out.print(execution_cost + " ");
@@ -475,7 +468,13 @@ public class Main {
 		//	if(check >= 50)
 		//		break;
 			
-			
+			//finding inter island communication for this subtask
+			for(int i = 0; i < no_of_subtasks; i++) {
+				if(predecessor_mat[subtask][i] == 1 && subtask_to_processor[i] % 2 != subtask_to_processor[subtask] % 2) {
+					island_communication++;
+				}
+			}
+			System.out.println("comm. cost " + subtask + " " + island_communication);
 			int rand_no = rand.nextInt(pair-1), i;
 			double offset, temp_voltage, temp_energy;
 			if(island == 0) {
