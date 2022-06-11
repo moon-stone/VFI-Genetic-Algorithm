@@ -467,7 +467,7 @@ public class Main {
 				island_communication++;
 			}
 		}
-	//	System.out.println("comm. cost " + subtask + " " + island_communication);
+		System.out.println("comm. cost " + subtask + " " + island_communication);
 		while(execution_cost > 0) {
 			
 		//	System.out.print(execution_cost + " ");
