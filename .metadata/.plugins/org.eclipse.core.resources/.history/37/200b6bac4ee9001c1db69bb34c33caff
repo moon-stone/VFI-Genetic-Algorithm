@@ -13,7 +13,7 @@ import java.util.Queue;
 import java.util.LinkedList;
 
 public class Main {
-	public int population_size, stoping_cond, pair1, pair2, island_communication;
+	public int population_size, stoping_cond, pair1, pair2;
 	public double mutation_rate, crossover_rate;
 	public int no_of_subtasks,  no_of_machines, min_fv = 999999999, counter;
 	public Scanner in_,  inheft_;
@@ -287,7 +287,7 @@ public class Main {
 			 }
 		 }
 		 
-		 island_communication = 0;
+		 
 		 Queue<Integer> q = new LinkedList<>();
 		 q.add(entry_task);
 		 visited[entry_task] = 1;
@@ -400,7 +400,7 @@ public class Main {
 		 for(int i = 0; i < no_of_machines; i++) {
 			 System.out.println(i + "th processor idle energy = " + idle_energy[i]);
 		 }
-		 System.out.println("Total communication between islands " + island_communication);
+		
 	}
 	
 	public boolean check_valid_order(int []temp_ss) {
@@ -467,13 +467,6 @@ public class Main {
 		//	check++;
 		//	if(check >= 50)
 		//		break;
-			
-			//finding inter island communication for this subtask
-			for(int i = 0; i < no_of_subtasks; i++) {
-				if(predecessor_mat[subtask][i] == 1 && subtask_to_processor[i] % 2 != subtask_to_processor[subtask] % 2) {
-					island_communication++;
-				}
-			}
 			int rand_no = rand.nextInt(pair-1), i;
 			double offset, temp_voltage, temp_energy;
 			if(island == 0) {
