@@ -13,7 +13,7 @@ import java.util.Queue;
 import java.util.LinkedList;
 
 public class Main {
-	public int population_size, stoping_cond, pair1, pair2, island_communication;
+	public int population_size, stoping_cond, pair1, pair2, island_communication, final_makespan;
 	public double mutation_rate, crossover_rate;
 	public int no_of_subtasks,  no_of_machines, min_fv = 999999999, counter;
 	public Scanner in_,  inheft_;
@@ -370,13 +370,16 @@ public class Main {
 			 System.out.println(i + "th subtask start and end time with processor no. = " + start_time[i] + " " + 
 		             end_time[i] + " " + subtask_to_processor[i]);
 		 }
-		 
+		 final_makespan = 0;
 		 for(int i = 0; i < no_of_machines; i++) {
+			 // finding final makespan to calculate idle energy
+			 final_makespan = Math.max(final_makespan, processor_last_task_end_time[i]);
 			 System.out.println(i + "th processor busy energy = " + busy_energy[i]);
 		 }
 		 
 		 //idle energy computation
 		 double idle_energy_island0, idle_energy_island1;
+		 
 		 idle_energy_island0 = voltage_pair1[pair1-1][2];
 		 idle_energy_island1 = voltage_pair2[pair2-1][2];
 		 for(int i = 0; i < no_of_machines; i++) {
@@ -388,12 +391,15 @@ public class Main {
 				 else
 					 break;
 			 }
+			 
+			 idle_time = idle_time + final_makespan - processor_last_task_end_time[i];
 			 if(processor_to_island[i] == 0) {
 				 idle_energy[i] = idle_time * idle_energy_island0;
 			 }
 			 else {
 				 idle_energy[i] = idle_time * idle_energy_island1;
 			 }
+			 
 			 System.out.println("total idle time and last busy time for processor" + i + " is " +idle_time + " " + processor_last_task_end_time[i]);
 		 }
 		 
