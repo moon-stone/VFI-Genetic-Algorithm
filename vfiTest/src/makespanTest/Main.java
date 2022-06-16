@@ -26,6 +26,7 @@ public class Main {
 	LinkedList<Integer>[] available_slot;
 	public Main(String file_name) throws IOException{
 		in_ = new Scanner(new FileInputStream(file_name));
+		out_ = new PrintStream(new FileOutputStream("input1.txt")); //we are going to save the details of i/p to this file
 		
 		///------------------taking input from file--------------------
 		
@@ -36,6 +37,7 @@ public class Main {
 				break;
 			}
 		}
+		out_.print(no_of_machines+" ");
 		System.out.println("no. of machines " +no_of_machines);
 		
 		//finding no of subtasks
@@ -45,6 +47,7 @@ public class Main {
 				break;
 			}
 		}
+		out_.println(no_of_subtasks);
 		System.out.println("no. of subtask " +no_of_subtasks);
 		
 		
@@ -75,12 +78,15 @@ public class Main {
 	//	}
 		
 		//estimated cost matrix
+		System.out.println("---------estimated cost-----------");
 		for (int i = 0; i < no_of_subtasks; i++) {
 			in_.next();
 			for (int j = 0; j < no_of_machines; j++) {
 				est[i][j] = in_.nextInt();
+				out_.print(est[i][j]+" ");///write to output file
 				System.out.print(est[i][j] + " ");
 			}
+			out_.println();
 			System.out.println();
 		}
 		int x, y, w;
@@ -100,10 +106,12 @@ public class Main {
 		for (int i = 0; i < no_of_subtasks; i++) {
 			for (int j = 0; j < no_of_subtasks; j++) {
 				System.out.print(rel[i][j] + " ");
+				out_.print(rel[i][j]+" ");///write to output file
 				if(rel[i][j] != 0) {
 					predecessor_mat[j][i] = 1;
 				}
 			}
+			out_.println();
 			System.out.println();
 		}
 		
