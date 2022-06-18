@@ -50,9 +50,7 @@ public class Driver {
 						System.out.println(file1);
 						
 						
-						//new makespanTest.Main(file1);
-						makespanTest.Main m = new makespanTest.Main(file1);
-						System.out.println("final makespan, total energy and island comm = "+m.final_makespan + ", " + m.total_energy + ", "+ m.island_communication);
+						new makespanTest.Main(file1);
 					}
 					
 				}
