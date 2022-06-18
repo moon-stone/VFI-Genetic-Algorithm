@@ -417,7 +417,6 @@ public class Main {
 			 System.out.println(i + "th processor idle energy = " + idle_energy[i]);
 		 }
 		 System.out.println("Total communication between islands " + island_communication);
-		 System.out.println("Makespan , total_energy, island communication = " + final_makespan + ", " + total_energy+ ", " + island_communication);
 	}
 	
 	public boolean check_valid_order(int []temp_ss) {

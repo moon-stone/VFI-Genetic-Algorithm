@@ -14,7 +14,7 @@ import java.util.LinkedList;
 
 public class Main {
 	public int population_size, stoping_cond, pair1, pair2, island_communication, final_makespan;
-	public double mutation_rate, crossover_rate, total_energy;;
+	public double mutation_rate, crossover_rate;
 	public int no_of_subtasks,  no_of_machines, min_fv = 999999999, counter;
 	public Scanner in_,  inheft_;
 	public PrintStream out_;
@@ -296,7 +296,6 @@ public class Main {
 		 }
 		 
 		 island_communication = 0;
-		 total_energy = 0;
 		 Queue<Integer> q = new LinkedList<>();
 		 q.add(entry_task);
 		 visited[entry_task] = 1;
@@ -383,7 +382,6 @@ public class Main {
 		 for(int i = 0; i < no_of_machines; i++) {
 			 // finding final makespan to calculate idle energy
 			 final_makespan = Math.max(final_makespan, processor_last_task_end_time[i]);
-			 total_energy = total_energy + busy_energy[i];
 			 System.out.println(i + "th processor busy energy = " + busy_energy[i]);
 		 }
 		 
@@ -409,7 +407,7 @@ public class Main {
 			 else {
 				 idle_energy[i] = idle_time * idle_energy_island1;
 			 }
-			 total_energy = total_energy + idle_energy[i];
+			 
 			 System.out.println("total idle time and last busy time for processor" + i + " is " +idle_time + " " + processor_last_task_end_time[i]);
 		 }
 		 
@@ -417,7 +415,6 @@ public class Main {
 			 System.out.println(i + "th processor idle energy = " + idle_energy[i]);
 		 }
 		 System.out.println("Total communication between islands " + island_communication);
-		 System.out.println("Makespan , total_energy, island communication = " + final_makespan + ", " + total_energy+ ", " + island_communication);
 	}
 	
 	public boolean check_valid_order(int []temp_ss) {
