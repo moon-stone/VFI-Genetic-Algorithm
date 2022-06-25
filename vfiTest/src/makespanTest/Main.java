@@ -12,6 +12,17 @@ import java.util.Random;
 import java.util.Queue;
 import java.util.LinkedList;
 
+import java.util.*;
+
+class Pair{
+	public int x;
+	public int y;
+	public Pair(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+}
+
 public class Main {
 	public int population_size, stoping_cond, pair1, pair2, island_communication, final_makespan;
 	public double mutation_rate, crossover_rate, total_energy;;
@@ -22,9 +33,11 @@ public class Main {
 	public int[][] est, rel, island_to_processor, predecessor_mat;
 	public double[][] voltage_pair1, voltage_pair2, slot_voltage;
 	public double[] busy_energy, idle_energy;
-	public int[] degree, start_time, end_time, processor_avail_time, processor_slots, processor_last_task_end_time;
+	public int[] degree, start_time, end_time, temp_start_time, processor_avail_time, processor_slots, processor_last_task_end_time;
 	LinkedList<Integer>[] available_slot;
-	public Main(String file_name) throws IOException{
+	ArrayList<Pair> subtask_ordering = new ArrayList<Pair>();
+	
+	public Main(String file_name, int slot_size) throws IOException{
 		in_ = new Scanner(new FileInputStream(file_name));
 		out_ = new PrintStream(new FileOutputStream("input1.txt")); //we are going to save the details of i/p to this file
 		
@@ -57,6 +70,7 @@ public class Main {
 		predecessor_mat = new int [no_of_subtasks][no_of_subtasks];
 		start_time = new int[no_of_subtasks];
 		end_time = new int[no_of_subtasks];
+		temp_start_time = new int[no_of_subtasks];
 		processor_avail_time = new int[no_of_machines];
 		subtask_to_processor = new int[no_of_subtasks];
 		processor_to_island = new int[no_of_machines];
@@ -67,6 +81,7 @@ public class Main {
 		processor_slots = new int[no_of_machines];
 		slot_voltage = new double[2][500000];
 		available_slot = new LinkedList[no_of_machines];
+		Pair order_of_subtask[] = new Pair[no_of_subtasks];
 		for (int i=0; i < no_of_machines; i++) {
 		    available_slot[i] = new LinkedList<Integer>();
 		    processor_slots[i] = 1;
@@ -294,7 +309,7 @@ public class Main {
 				 break;
 			 }
 		 }
-		 
+		 System.out.println("Slot size is " + slot_size);
 		 island_communication = 0;
 		 total_energy = 0;
 		 Queue<Integer> q = new LinkedList<>();
@@ -333,10 +348,10 @@ public class Main {
 						 expected_allocation_time = expected_min_allocation_time(node, i);
 						 subtask_to_processor[node] = temp_processor;
 						 if(temp_island == 0) {
-							 subtask_execution(temp_processor, node, temp_island, pair1, expected_allocation_time);
+							 subtask_execution(temp_processor, node, temp_island, pair1, expected_allocation_time, slot_size);
 						 }
 						 else {
-							 subtask_execution(temp_processor, node, temp_island, pair2, expected_allocation_time);
+							 subtask_execution(temp_processor, node, temp_island, pair2, expected_allocation_time, slot_size);
 						 }
 					     break;
 					 }
@@ -363,10 +378,10 @@ public class Main {
 				 subtask_to_processor[node] = temp_processor;
 		
 				 if(temp_island == 0) {
-					 subtask_execution(temp_processor, node, temp_island, pair1, expected_allocation_time);
+					 subtask_execution(temp_processor, node, temp_island, pair1, expected_allocation_time, slot_size);
 				 }
 				 else {
-					 subtask_execution(temp_processor, node, temp_island, pair2, expected_allocation_time);
+					 subtask_execution(temp_processor, node, temp_island, pair2, expected_allocation_time, slot_size);
 				 }
 			 
 			 }
@@ -374,10 +389,12 @@ public class Main {
 			 
 		 }
 		 System.out.println();
+		 
 		 for(int i = 0; i < no_of_subtasks; i++) {
 			 
-			 System.out.println(i + "th subtask start and end time with processor no. = " + start_time[i] + " " + 
+			 System.out.println(i + " subtask start and end time with processor no. = " + start_time[i] + " " + 
 		             end_time[i] + " " + subtask_to_processor[i]);
+			 
 		 }
 		 final_makespan = 0;
 		 for(int i = 0; i < no_of_machines; i++) {
@@ -418,6 +435,34 @@ public class Main {
 		 }
 		 System.out.println("Total communication between islands " + island_communication);
 	//	 System.out.println("Makespan , total_energy, island communication = " + final_makespan + ", " + total_energy+ ", " + island_communication);
+	
+		 int [] temp_start_time2 = new int [no_of_subtasks];
+		 for(int i = 0; i < no_of_subtasks; i++) {
+			 temp_start_time[i] = start_time[i];
+			 temp_start_time2[i] = start_time[i];
+		 }
+		 Arrays.sort(temp_start_time);
+		 for(int i = 0; i < no_of_subtasks; i++) {
+			 int check = temp_start_time[i], subtask = 0;
+			 for(int j = 0; j < no_of_subtasks; j++) {
+				 if(check == temp_start_time2[j]) {
+					 subtask = j;
+					 temp_start_time2[j] = -1;
+					 break;
+					 //System.out.println()
+				 }
+			 }
+			 subtask_ordering.add(new Pair(subtask, subtask_to_processor[subtask]));
+			// System.out.println(subtask + " " + subtask_to_processor[subtask]);
+		 }
+		 System.out.println("order of subtask execution with processor no");
+		
+		 for(int i = 0; i < no_of_subtasks; i++) {
+			// System.out.println(subtask_ordering.get(i));
+			 int subtask = subtask_ordering.get(i).x;
+			 int processor = subtask_ordering.get(i).y;
+			 System.out.println("subtask " + subtask + " starts at "+ start_time[subtask]+  " and runs on processor " + processor);
+		 }
 	}
 	
 	public boolean check_valid_order(int []temp_ss) {
@@ -470,11 +515,12 @@ public class Main {
 	}
 	
 	//pair variable holds no of voltage pairs available for that island.
-	public void subtask_execution(int processor, int subtask, int island, int pair, int expected_allocation_time) {
+	public void subtask_execution(int processor, int subtask, int island, int pair, int expected_allocation_time, int slot_size) {
 		double execution_cost = est[subtask][processor];
 	//	int next = expected_allocation_time;
 		Random rand = new Random();
-		int last_slot = 20, flag = 0;
+	//	int last_slot = 20, flag = 0;
+		int last_slot = slot_size, flag = 0;
 	//	int check = 0;
 		System.out.println();
 		System.out.print(subtask + " ");
@@ -509,7 +555,7 @@ public class Main {
 			for(i = 0; i < available_slot[processor].size(); i = i+2) {
 				last_slot = available_slot[processor].get(i+1);
 				if(expected_allocation_time < last_slot) {
-					int slot = (available_slot[processor].get(i)/20);
+					int slot = (available_slot[processor].get(i)/slot_size);
 					if(slot_voltage[island][slot] == 0) {
 						slot_voltage[island][slot] = temp_voltage;
 					}
@@ -524,12 +570,13 @@ public class Main {
 					//	expected_allocation_time = available_slot[processor].get(i);
 					
 					if((expected_allocation_time) == available_slot[processor].get(i)) {
+						if(flag == 0) {
+							flag = 1;
+							start_time[subtask] = (expected_allocation_time);
+						//	System.out.print("A " + subtask + " ");
+						}
 						if(execution_cost > (last_slot - (expected_allocation_time))) {
-							if(flag == 0) {
-								flag = 1;
-								start_time[subtask] = (expected_allocation_time);
-							//	System.out.print("A " + subtask + " ");
-							}
+							
 							execution_cost = execution_cost - (last_slot - (expected_allocation_time));
 							expected_allocation_time = last_slot;
 							busy_energy[processor] = busy_energy[processor] + (last_slot - (expected_allocation_time)) * temp_energy;
@@ -555,12 +602,13 @@ public class Main {
 					
 					else if(expected_allocation_time > available_slot[processor].get(i)) {
 						int t = expected_allocation_time;
+						if(flag == 0) {
+							flag = 1;
+							start_time[subtask] = (expected_allocation_time);
+					//		System.out.print("B " + subtask + " ");
+						}
 						if(execution_cost > (last_slot - (expected_allocation_time))) {
-							if(flag == 0) {
-								flag = 1;
-								start_time[subtask] = (expected_allocation_time);
-						//		System.out.print("B " + subtask + " ");
-							}
+							
 							execution_cost = execution_cost - (last_slot - (expected_allocation_time));
 		                    busy_energy[processor] = busy_energy[processor] + (last_slot - (expected_allocation_time)) * temp_energy;
 							expected_allocation_time = last_slot;
@@ -578,12 +626,13 @@ public class Main {
 						available_slot[processor].set(i+1, t);					
 					}
 					else if((expected_allocation_time) < available_slot[processor].get(i)) {
+						if(flag == 0) {
+							flag = 1;
+							start_time[subtask] = available_slot[processor].get(i);
+					//		System.out.println(" C " + subtask + " ");
+						}
 						if(execution_cost > (last_slot - available_slot[processor].get(i))) {
-							if(flag == 0) {
-								flag = 1;
-								start_time[subtask] = available_slot[processor].get(i);
-						//		System.out.println(" C " + subtask + " ");
-							}
+							
 							execution_cost = execution_cost - (last_slot - available_slot[processor].get(i));
 							busy_energy[processor] = busy_energy[processor] + (last_slot - available_slot[processor].get(i)) * temp_energy;
 							expected_allocation_time = last_slot;
@@ -608,8 +657,10 @@ public class Main {
 		//	System.out.print(execution_cost + " ");
 			if(i == available_slot[processor].size() || available_slot[processor].size() == 0) {
 				int slot = processor_slots[processor];
-				available_slot[processor].add(slot*20);
-				available_slot[processor].add(slot*20+20);
+			//	available_slot[processor].add(slot*20);
+			//	available_slot[processor].add(slot*20+20);
+				available_slot[processor].add(slot*slot_size);
+			    available_slot[processor].add(slot*slot_size+slot_size);
 			    processor_slots[processor] = slot+1;
 			}
 			
